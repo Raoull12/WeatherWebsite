@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js" defer></script>
+    <script src="validation.js" defer></script>
+</head>
+<body>
+    
+    <h1>Register</h1>
+    <div id="error"></div>
+    <form id ="form" action="registration.php" method="post">
+        <div>
+            <span id="check-username"></span>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" onblur="checkUsername()" required>
+        </div>
+        
+        <div class ="input-control">
+            <span id="check-email"></span>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" onblur="checkEmail()" required>
+        </div>
+        
+        <div class ="input-control">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <div class ="input-control">
+            <label for="password_confirmation">Repeat password</label>
+            <input type="password" id="password_confirmation" name="password_confirmation" required>
+        </div>
+
+        <label for="timezone">Time Zone:</label>
+        <select id="timezone" name="timezone">
+            <option value="Amsterdam">Amsterdam (GMT+1)</option>
+            <option value="Athens">Athens (GMT+2)</option>
+            <option value="Belgrade">Belgrade (GMT+1)</option>
+            <option value="Berlin">Berlin (GMT+1)</option>
+        </select>
+
+        <label for="temperature_unit">Temperature Unit:</label>
+        <select id="temperature_unit" name="temperature_unit">
+            <option value="celsius">Celsius</option>
+            <option value="fahrenheit">Fahrenheit</option>
+        </select>
+        <button id="submit" type="submit" value="submit">Register</button>
+    </form>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js">//this script is necessary for the below to work</script>
+
+    <script>
+        function checkEmail() { // the onblur="checkEmail()" calls this function when inputting in the email field
+            jQuery.ajax({ // an ajax request using jquery is initiated
+                url: "check-availability.php", //the ajax request is sent to this url
+                data: 'email='+$("#email").val(), //passing the email parameter's value from above with the request
+                type: "POST", // passing the data in a POST request
+                success:function(data) //once the ajax request is successful
+                {
+                    $("#check-email").html(data); //the span id="check-email" is passed the result of the email check from the server
+                },
+                error:function (){}
+            })
+        }
+
+        function checkUsername() {
+            jQuery.ajax({
+                url: "check-availability.php",
+                data: 'username='+$("#username").val(),
+                type: "POST",
+                success:function(data)
+                {
+                    $("#check-username").html(data);
+                },
+                error:function (){}
+            })
+        }
+    </script>
+</body>
+</html>
