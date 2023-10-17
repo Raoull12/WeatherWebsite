@@ -19,17 +19,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if (password_verify($_POST["password"], $user["password"])) 
             //matching the user's password in the db with the password of the POST request
             {
+
             session_start();
-            session_regenerate_id();
-            $_SESSION["user_id"] = $user["id"]; //making the session id = userid
+            $_SESSION["id"] = $user["id"];
+            $_SESSION["username"] = $user["username"]; //making the session id = userid
             header("Location: index.php");
             exit;
+
+            } else
+            {
+                $is_invalid = true; // if pass incorrect display error
             }
+        } else
+        {
+            $is_invalid = true; // if email is incorrect display the error
         }
     } 
 else 
 {
-    $is_invalid = true; // if email is not valid than is invalid = true
+    $is_invalid = true; // if both incorrect display error
 }
 }
 ?>

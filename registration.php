@@ -51,10 +51,10 @@ if ($result->num_rows > 0) {
     die("Email already taken");
 }
 
-$timezone = $_POST["timezone"];
+$location = $_POST["location"];
 $temperature_unit = $_POST["temperature_unit"];
 
-if (empty($timezone) || empty($temperature_unit)) {
+if (empty($location) || empty($temperature_unit)) {
     die("Please select a time zone and temperature unit");
 }
 
@@ -72,7 +72,7 @@ $userstmt->bind_param("ssss", $_POST["username"], $_POST["email"], $password_has
 if ($userstmt->execute()) {
     $user_id = $mysqli->insert_id; // Getting the user id
 
-    $sql2 = "INSERT INTO user_preferences (user_id, time_format, temperature_unit) VALUES (?, ?, ?)";
+    $sql2 = "INSERT INTO user_preferences (user_id, location, temperature_unit) VALUES (?, ?, ?)";
     $prefstmt = $mysqli->prepare($sql2);
     $prefstmt->bind_param("iss", $user_id, $timezone, $temperature_unit);
 
