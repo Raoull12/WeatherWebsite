@@ -36,7 +36,8 @@ form.addEventListener('submit', (e) => { // when clicking submit the following w
         messages.push('Passwords have to match');
     }
 
-    if(messages.length > 0) {
+    if(messages.length > 0) 
+    {
         e.preventDefault(); // prevent redirect to registration.php if messages array is populated
         errorElement.innerText = messages.join(', '); // joining multiple errors with a , for a better user experience.
     }

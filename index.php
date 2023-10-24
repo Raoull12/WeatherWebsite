@@ -19,7 +19,7 @@
         $location = $user["location"]; // fetching the location and temperature unit and storing them in local variables.
         $temperature_unit = $user["temperature_unit"];
 
-        
+
     }
 ?>
 
@@ -46,8 +46,6 @@
         <a href="logout.php">Log Out</a>
         <a href="edit-profile.php">Edit Profile</a>
     </div>
-
-    <!-- The rest of your content goes here -->
 
 </body>
 </html>

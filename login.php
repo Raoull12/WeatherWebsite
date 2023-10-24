@@ -52,7 +52,7 @@ else
 <body>
     <h1>Login</h1>
     <?php if ($is_invalid)://basically if isinvalid = true the below is displayed ?>
-        <em>Invalid Email and/or Password</em>
+        <em>Invalid Email and/or Password.</em>
     <?php endif; ?>
     <form method="post">
         <label for="email">Email</label>

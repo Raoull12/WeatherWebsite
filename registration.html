@@ -40,9 +40,9 @@
             <option value="Athens">Athens (GMT+2)</option>
             <option value="Belgrade">Belgrade (GMT+1)</option>
             <option value="Berlin">Berlin (GMT+1)</option>
-            <option value="Berlin">London (GMT+1)</option>
-            <option value="Berlin">Rome (GMT+1)</option>
-            <option value="Berlin">Valletta (GMT+1)</option>
+            <option value="London">London (GMT+1)</option>
+            <option value="Rome">Rome (GMT+1)</option>
+            <option value="Valletta">Valletta (GMT+1)</option>
         </select>
 
         <label for="temperature_unit">Temperature Unit:</label>
@@ -65,10 +65,11 @@
                 {
                     $("#check-email").html(data); //the span id="check-email" is passed the result of the email check from the server
                 },
+                
                 error:function (){}
             })
         }
-
+        // Same goal as the checkEmail() Function.
         function checkUsername() {
             jQuery.ajax({
                 url: "check-availability.php",

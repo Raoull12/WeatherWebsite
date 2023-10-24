@@ -29,10 +29,12 @@ if (!empty($_POST["username"])) {
   $query->store_result();
   $count = $query->num_rows;
 
-  if ($count > 0) {
+  if ($count > 0) 
+  {
       echo "<span style='color:#fff'>Username Already Exists.</span>";
       echo "<script>$('#submit').prop('disabled',true);</script>";
-  } else {
+  } else 
+  {
       echo "<span style='color:#fff'>Username is available.</span>";
       echo "<script>$('#submit').prop('disabled',false);</script>";
   }
