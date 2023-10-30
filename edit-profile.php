@@ -168,7 +168,7 @@
     </form>
 
     <div class="top-right-links">
-        <a href="index.php">Go to Index</a>
+        <a href="dashboard.php">Go to Dashboard</a>
         <a href="logout.php">Log Out</a>
         <a href="change_password.php">Change Password</a>
         <a href="delete.php">Delete Account</a>

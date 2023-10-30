@@ -1,5 +1,5 @@
 <?php
-$is_invalid = false;
+    $is_invalid = false;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $mysqli = require __DIR__ . "/db_connection.php";
@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             session_start();
             $_SESSION["id"] = $user["id"];
             $_SESSION["username"] = $user["username"]; //making the session id = userid
-            header("Location: index.php");
+            header("Location: dashboard.php");
             exit;
 
             } else

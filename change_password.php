@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start(); //starting session to retrieve superglobals.
 
 if (!isset($_SESSION["id"])) {
     header("Location: login.php");
@@ -83,7 +83,7 @@ $userId = $_SESSION["id"];
     </form>
 
     <div class="top-right-links">
-        <a href="index.php">Go to Index</a>
+        <a href="dashboard.php">Go to Dashboard</a>
         <a href="logout.php">Log Out</a>
         <a href="edit-profile.php">Edit Profile</a>
     </div>
