@@ -31,7 +31,8 @@ if (!isset($_SESSION["id"])) {
         "Amsterdam" => ["latitude" => 52.3676, "longitude" => 4.9041]
     ];
 
-    if (array_key_exists($location, $locations)) {
+    if (array_key_exists($location, $locations)) 
+    {
         $latitude = $locations[$location]["latitude"];
         $longitude = $locations[$location]["longitude"];
 
@@ -44,7 +45,8 @@ if (!isset($_SESSION["id"])) {
         // Decoding JSON Response
         $weatherData = json_decode($jsonResponse);
 
-        if ($weatherData !== null) {
+            if ($weatherData !== null) 
+            {
 
             // Extracting weather description from API response to check the status in order to retrieve the associated image.
             $weatherDescription = $weatherData->weather[0]->description;
@@ -64,13 +66,18 @@ if (!isset($_SESSION["id"])) {
 
             $imagePath = "images/";
 
-            if (stripos($weatherDescription, 'clear') !== false) {
+                if (stripos($weatherDescription, 'clear') !== false) 
+                {
                 $imagePath .= "clear.png";
-            } elseif (stripos($weatherDescription, 'cloud') !== false) {
+                } 
+                elseif (stripos($weatherDescription, 'cloud') !== false) 
+                {
                 $imagePath .= "fewclouds.png";
-            } elseif (stripos($weatherDescription, 'rain') !== false) {
+                } 
+                elseif (stripos($weatherDescription, 'rain') !== false) 
+                {
                 $imagePath .= "rain.png";
-            }
+                }
 
             
             // Displaying Weather Image.
@@ -85,7 +92,7 @@ if (!isset($_SESSION["id"])) {
             $localTime = date("Y-m-d H:i:s", $currentTime);
             echo "Local Date and Time: " . $localTime . "<br>";
 
-            echo "<br><br><br> Have a nice Day!";
+            echo "<br><br><br><br>";
 
         } else {
             echo "Failed to fetch weather data.";
@@ -93,6 +100,7 @@ if (!isset($_SESSION["id"])) {
     } else {
         echo "Invalid location selected.";
     }
+
 }
 ?>
 <!DOCTYPE html>
@@ -115,8 +123,117 @@ if (!isset($_SESSION["id"])) {
     </style>
 </head>
 <body>
-    <div class="top-right-links">
-        <a href="logout.php">Log Out</a>
-        <a href="edit-profile.php">Edit Profile</a>
-        <a href="search.php">Search</a>
-    </div>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <style>
+        .top-right-links {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .top-right-links a {
+            margin-left: 10px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<form id="search-form">
+    <label for="start-date">Start Date:</label>
+    <input type="date" id="start-date" name="start-date">
+
+    <label for="end-date">End Date:</label>
+    <input type="date" id="end-date" name="end-date">
+
+    <label for="weather-type">Weather Type:</label>
+    <select id="weather-type" name="weather-type">
+        <option value="sun">Sun</option>
+        <option value="clouds">Clouds</option>
+        <option value="rain">Rain</option>
+        <!-- Add other weather types as needed -->
+    </select>
+
+    <button type="button" id="search-button">Search</button>
+</form>
+<div class="top-right-links">
+    <a href="logout.php">Log Out</a>
+    <a href="edit-profile.php">Edit Profile</a>
+    <a href="search.php">Search</a>
+</div>
+
+<div id="search-results">
+    <h2>Search Results</h2>
+    <div id="search-results-content"></div>
+</div>
+</body>
+</html>
+
+<script>
+// Add an event listener for the search button
+document.getElementById('search-button').addEventListener('click', function() {
+    // Get user input
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    const weatherType = document.getElementById('weather-type').value;
+
+    // Send AJAX request to the server
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'search.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    // Define the data to send
+    const data = `start-date=${startDate}&end-date=${endDate}&weather-type=${weatherType}`;
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Handle the server's response (display search results)
+            const searchResults = JSON.parse(xhr.responseText);
+            displaySearchResults(searchResults);
+        }
+    };
+
+    // Send the AJAX request
+    xhr.send(data);
+});
+
+function displaySearchResults(results) {
+    const searchResultsContent = document.getElementById('search-results-content');
+    searchResultsContent.innerHTML = ''; // Clear any previous results
+
+    if (results.length === 0) {
+        searchResultsContent.innerHTML = '<p>No results found.</p>';
+        return;
+    }
+
+    // Iterate through the search results and display them
+    results.forEach(result => {
+        const resultContainer = document.createElement('div');
+        resultContainer.className = 'search-result';
+
+        const timestamp = new Date(result.dt * 1000); // Convert UNIX timestamp to a date
+        const temperature = result.main.temp;
+
+        // Create HTML elements to display the result
+        const dateElement = document.createElement('p');
+        dateElement.textContent = 'Date: ' + timestamp.toLocaleDateString() + ' ' + timestamp.toLocaleTimeString();
+
+        const temperatureElement = document.createElement('p');
+        temperatureElement.textContent = 'Temperature: ' + temperature + ' °K';
+
+        // Append elements to the result container
+        resultContainer.appendChild(dateElement);
+        resultContainer.appendChild(temperatureElement);
+
+        // Append the result container to the search results content
+        searchResultsContent.appendChild(resultContainer);
+    });
+}
+</script>
+
+
+    
