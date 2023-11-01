@@ -21,6 +21,8 @@ if (!isset($_SESSION["id"])) {
 
     echo "Hello " . $username . " :)";
 
+    $mysqli->close();
+
     $locations = [
         "London" => ["latitude" => 51.5074, "longitude" => -0.1278],
         "Valletta" => ["latitude" => 35.8989, "longitude" => 14.5146],
@@ -51,11 +53,21 @@ if (!isset($_SESSION["id"])) {
             // Extracting weather description from API response to check the status in order to retrieve the associated image.
             $weatherDescription = $weatherData->weather[0]->description;
 
-            $temperatureinKelvin = $weatherData->main->temp;
-            $Celsius = $temperatureinKelvin - 273.15;
+            $temperatureinKelvin = $weatherData->main->temp; // fetching the default temperature setting
+
+            if($temperature_unit === "Fahrenheit")
+            {
+                $temperature = ($temperatureinKelvin - 273.15) * 9/5 + 32; //Formula from Kelvin to Fahrenheit
+                $temperatureUnitSymbol = "°F";
+            }
+            else // default setting which is Celsius
+            {
+                $temperature = $temperatureinKelvin - 273.15; //Formula from Kelvin to Celsius
+                $temperatureUnitSymbol = "°C";
+            }
 
             echo "<h1>Weather Information for $location</h1>";
-            echo "Temperature: " . round($Celsius, 2) . " °C<br>"; // Rounding to 2 decimal places
+            echo "Temperature: " . round($temperature, 2) . " " . $temperatureUnitSymbol . "<br>";
             echo "Description: " . $weatherDescription . "<br>";
 
             // Additional weather details
@@ -66,11 +78,29 @@ if (!isset($_SESSION["id"])) {
 
             $imagePath = "images/";
 
-                if (stripos($weatherDescription, 'clear') !== false) 
+            // Convert the UNIX timestamp (dt) to a human-readable date and tim
+            $timestamp = $weatherData->dt;
+            $localTime = new DateTime("@$timestamp", new DateTimeZone('UTC')); // Create a DateTime object from the timestamp
+            $localTime->setTimezone(new DateTimeZone('Europe/Rome')); // Set the time zone based on the selected location (e.g., Europe/Rome)
+
+             // Getting the current time in 24-hour format
+            $currentHour = (int)date('H', $localTime->getTimestamp());
+
+            if ($currentHour >= 6 && $currentHour < 18) 
+            {
+                // Daytime logic
+                if (stripos($weatherDescription, 'clear') !== false) {
+                    $imagePath .= "sun.png";
+                }
+            }  
+                // Nighttime logic
+                if ($currentHour <= 6 && $currentHour >= 18)
                 {
-                $imagePath .= "clear.png";
-                } 
-                elseif (stripos($weatherDescription, 'cloud') !== false) 
+                if (stripos($weatherDescription, 'clear') !== false) {
+                    $imagePath .= "moon.png";
+                }
+            }
+                if (stripos($weatherDescription, 'cloud') !== false) 
                 {
                 $imagePath .= "fewclouds.png";
                 } 
@@ -85,14 +115,12 @@ if (!isset($_SESSION["id"])) {
 
             $timezoneOffset = $weatherData->timezone;
 
-            // Calculate the local time in the selected location.
-            $currentTime = time() + $timezoneOffset;
-
-            // Format and display the local time.
-            $localTime = date("Y-m-d H:i:s", $currentTime);
-            echo "Local Date and Time: " . $localTime . "<br>";
+            // Format and display the local time
+            echo "Local Date and Time: " . $localTime->format("Y-m-d H:i:s") . "<br>";
 
             echo "<br><br><br><br>";
+
+
 
         } else {
             echo "Failed to fetch weather data.";
@@ -151,19 +179,19 @@ if (!isset($_SESSION["id"])) {
     <input type="date" id="end-date" name="end-date">
 
     <label for="weather-type">Weather Type:</label>
-    <select id="weather-type" name="weather-type">
-        <option value="sun">Sun</option>
-        <option value="clouds">Clouds</option>
-        <option value="rain">Rain</option>
-        <!-- Add other weather types as needed -->
-    </select>
+<select id="weather-type" name="weather-type">
+    <option value="">Select Weather Type (optional)</option>
+    <option value="clear">Clear</option>
+    <option value="clouds">Clouds</option>
+    <option value="rain">Rain</option>
+</select>
+
 
     <button type="button" id="search-button">Search</button>
 </form>
 <div class="top-right-links">
     <a href="logout.php">Log Out</a>
     <a href="edit-profile.php">Edit Profile</a>
-    <a href="search.php">Search</a>
 </div>
 
 <div id="search-results">
@@ -176,12 +204,12 @@ if (!isset($_SESSION["id"])) {
 <script>
 // Add an event listener for the search button
 document.getElementById('search-button').addEventListener('click', function() {
-    // Get user input
+    // Getting user input
     const startDate = document.getElementById('start-date').value;
     const endDate = document.getElementById('end-date').value;
     const weatherType = document.getElementById('weather-type').value;
 
-    // Send AJAX request to the server
+    // Send AJAX request to the server script
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'search.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -217,6 +245,7 @@ function displaySearchResults(results) {
 
         const timestamp = new Date(result.dt * 1000); // Convert UNIX timestamp to a date
         const temperature = result.main.temp;
+        const description = result.main.description;
 
         // Create HTML elements to display the result
         const dateElement = document.createElement('p');

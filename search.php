@@ -2,8 +2,9 @@
 session_start();
 
 if (!isset($_SESSION["id"])) {
-    header("Location: login.php");
+    header("Location: login.php"); //checking if user is logged in
 } else {
+
     $mysqli = require __DIR__ . "/db_connection.php";
     $user_id = $_SESSION["id"];
     $username = $_SESSION["username"];
@@ -28,33 +29,36 @@ if (!isset($_SESSION["id"])) {
         "Amsterdam" => ["latitude" => 52.3676, "longitude" => 4.9041]
     ];
     
-    if (isset($_POST['start-date']) && isset($_POST['end-date']) && isset($_POST['weather-type'])) {
-        $startDate = strtotime($_POST['start-date']);
-        $endDate = strtotime($_POST['end-date']);
-        $weatherType = $_POST['weather-type'];
+    if (isset($_POST['start-date']) && isset($_POST['end-date'])) { // Checking if a post request was sent with the minimal details
+      // Retrieving user input
+    $startDate = strtotime($_POST['start-date']);
+    $endDate = strtotime($_POST['end-date']);
+    $weatherType = isset($_POST['weather-type']) ? $_POST['weather-type'] : ''; // Check if weather-type is set
 
-        $apiKey = '64b1dd546784c2f64d1169be8b09db0b'; // Replace with your API key
+    $apiKey = '64b1dd546784c2f64d1169be8b09db0b';
 
-        $lat = $locations[$location]['latitude'];
-        $lon = $locations[$location]['longitude'];
+    $lat = $locations[$location]['latitude'];
+    $lon = $locations[$location]['longitude'];
 
-        $apiUrl = "https://history.openweathermap.org/data/2.5/history/city?lat=$lat&lon=$lon&type=hour&start=$startDate&end=$endDate&appid=$apiKey";
+    $apiUrl = "https://history.openweathermap.org/data/2.5/history/city?lat=$lat&lon=$lon&type=hour&start=$startDate&end=$endDate&appid=$apiKey";
 
-        $jsonResponse = file_get_contents($apiUrl);
+    $jsonResponse = file_get_contents($apiUrl);
 
-        $weatherData = json_decode($jsonResponse, true);
+    $weatherData = json_decode($jsonResponse, true);
 
-        $matchingWeatherData = [];
+    $matchingWeatherData = [];
 
-        foreach ($weatherData['list'] as $hourlyData) {
-            $weatherDescription = $hourlyData['weather'][0]['description'];
+    foreach ($weatherData['list'] as $hourlyData) {
+        $weatherDescription = $hourlyData['weather'][0]['description'];
 
-            if (stripos($weatherDescription, $weatherType) !== false) {
-                $matchingWeatherData[] = $hourlyData;
-            }
+        // Check if weather-type is empty or if it matches the user's specified type
+        if (empty($weatherType) || stripos($weatherDescription, $weatherType) !== false) {
+            $matchingWeatherData[] = $hourlyData;
         }
+    }
 
-        echo json_encode($matchingWeatherData);
+    echo json_encode($matchingWeatherData); //sending the data back to the dashboard
+
         exit(); // Terminate the script
     }
 }

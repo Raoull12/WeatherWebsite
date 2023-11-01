@@ -62,4 +62,6 @@ else
         <button>Log in</button>
     </form>
 </body>
+<p>Don't have an account?
+       You can now <a href="registration.html">register</a>.</p>
 </html>
