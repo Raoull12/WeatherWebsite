@@ -68,19 +68,27 @@ if (!isset($_SESSION["id"])) {
             // Getting the current time in 24-hour format
             $currentHour = (int)date('H', $localTime->getTimestamp());
 
+            echo $currentHour;
+
             // Daytime logic
             if ($currentHour >= 6 && $currentHour < 18) {
                 if (stripos($weatherDescription, 'clear') !== false) {
                     $imagePath .= "sun.png";
+                } else if (stripos($weatherDescription, 'cloud') !== false)
+                {
+                    $imagePath .= "fewclouds.png";
                 }
-            } else { // Nighttime logic
+            }            // Nighttime logic
+            else  if($currentHour >= 18 || $currentHour < 6){
                 if (stripos($weatherDescription, 'clear') !== false) {
                     $imagePath .= "moon.png";
+                }   else if (stripos($weatherDescription, 'cloud') !== false)
+                {
+                    $imagePath .= "fewcloudsnight.png";
                 }
             }
-            if (stripos($weatherDescription, 'cloud') !== false) {
-                $imagePath .= "fewclouds.png";
-            } elseif (stripos($weatherDescription, 'rain') !== false) {
+             elseif (stripos($weatherDescription, 'rain') !== false) 
+             {
                 $imagePath .= "rain.png";
             }
             

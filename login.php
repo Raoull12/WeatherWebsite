@@ -1,8 +1,9 @@
 <?php
     $is_invalid = false;
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $mysqli = require __DIR__ . "/db_connection.php";
+if ($_SERVER["REQUEST_METHOD"] === "POST") 
+{
+    include 'db_connection.php';
 
     if(filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
     {
@@ -24,13 +25,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["id"] = $user["id"];
             $_SESSION["username"] = $user["username"]; //making the session id = userid
             header("Location: dashboard.php");
+            $mysqli->close();
             exit;
 
             } else
             {
                 $is_invalid = true; // if pass incorrect display error
             }
-        } else
+        } 
+        else
         {
             $is_invalid = true; // if email is incorrect display the error
         }

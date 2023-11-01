@@ -5,7 +5,7 @@ if (!isset($_SESSION["id"])) {
     header("Location: login.php"); //checking if user is logged in
 } else {
 
-    $mysqli = require __DIR__ . "/db_connection.php";
+    include 'db_connection.php';
     $user_id = $_SESSION["id"];
     $username = $_SESSION["username"];
     $sql = "SELECT * FROM user_preferences WHERE user_id = ?";
@@ -18,6 +18,8 @@ if (!isset($_SESSION["id"])) {
 
     $location = $user["location"];
     $temperature_unit = $user["temperature_unit"];
+
+    $mysqli->close();
 
     $locations = [
         "London" => ["latitude" => 51.5074, "longitude" => -0.1278],

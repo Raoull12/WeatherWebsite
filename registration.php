@@ -27,7 +27,7 @@ if (!preg_match("/[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/", $_POST["password"])) {
     die("Password must contain at least one symbol");
 }
 
-$mysqli = require __DIR__ . "/db_connection.php";
+include 'db_connection.php';
 
 // Check if the username is already taken
 $sql = "SELECT * FROM users WHERE username = ?";
@@ -94,4 +94,7 @@ if ($userstmt->execute())
         die($mysqli->error . " " . $mysqli->errno);
     }
 }
+
+$mysqli->close();
+
 ?>

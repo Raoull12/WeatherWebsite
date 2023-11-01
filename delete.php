@@ -6,10 +6,9 @@ if (!isset($_SESSION["id"])) {
     exit;
 }
 
-$mysqli = require __DIR__ . "/db_connection.php";
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") 
 {
+    include 'db_connection.php';
     // Check if the user confirmed the account deletion
     if (isset($_POST["confirm"]) && $_POST["confirm"] === "yes") 
     {
@@ -32,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
         session_destroy();
 
         header("Location: deleted_confirmation.html"); // You can create this confirmation page
+        $mysqli->close();
         exit;
     }
 }
