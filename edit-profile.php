@@ -1,58 +1,69 @@
-<?php 
-    session_start(); // Starting the session to retrieve superglobals
+<?php
+session_start();
 
-    if (!isset($_SESSION["id"])) {
-        header("Location: login.php"); // If the user is not logged in, they will be redirected to login.php
-    } else {
-        $mysqli = require __DIR__ . "/db_connection.php";
+if (!isset($_SESSION["id"])) {
+    header("Location: login.php");
+} 
+else 
+{
+    $mysqli = require __DIR__ . "/db_connection.php";
 
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $newUsername = $_POST['username'];
-            $newEmail = $_POST['email'];
-            $newLocation = $_POST['location'];
-            $newTemperatureUnit = $_POST['temperature_unit'];
+    $successMessage = ""; // Initializing the success message
 
-            $userId = $_SESSION['id'];
+    if ($_SERVER["REQUEST_METHOD"] === "POST") 
+    {
+        $newUsername = $_POST['username'];
+        $newEmail = $_POST['email'];
+        $newLocation = $_POST['location'];
+        $newTemperatureUnit = $_POST['temperature_unit'];
 
-            if (!empty($newUsername)) {
-                $sql = "UPDATE users SET username = ? WHERE id = ?";
-                $stmt = $mysqli->prepare($sql);
-                $stmt->bind_param("si", $newUsername, $userId);
-                $stmt->execute();
-            }
+        $userId = $_SESSION['id']; //using the sessionId (which is the userId) to find the records in the database
 
-            if (!empty($newEmail)) {
-                $sql = "UPDATE users SET email = ? WHERE id = ?";
-                $stmt = $mysqli->prepare($sql);
-                $stmt->bind_param("si", $newEmail, $userId);
-                $stmt->execute();
-            }
-
-            if (!empty($newLocation)) {
-                $sql = "UPDATE user_preferences SET location = ? WHERE user_id = ?";
-                $stmt = $mysqli->prepare($sql);
-                $stmt->bind_param("si", $newLocation, $userId);
-                $stmt->execute();
-            }
-
-            if (!empty($newTemperatureUnit)) {
-                $sql = "UPDATE user_preferences SET temperature_unit = ? WHERE user_id = ?";
-                $stmt = $mysqli->prepare($sql);
-                $stmt->bind_param("si", $newTemperatureUnit, $userId);
-                $stmt->execute();
-            }
+        // the below checks for any modified fields and updates data in the db.
+        if (!empty($newUsername)) {
+            $sql = "UPDATE users SET username = ? WHERE id = ?";
+            $stmt = $mysqli->prepare($sql);
+            $stmt->bind_param("si", $newUsername, $userId);
+            $stmt->execute();
         }
 
-        $userId = $_SESSION["id"];
+        if (!empty($newEmail)) {
+            $sql = "UPDATE users SET email = ? WHERE id = ?";
+            $stmt = $mysqli->prepare($sql);
+            $stmt->bind_param("si", $newEmail, $userId);
+            $stmt->execute();
+        }
 
-        $sql = "SELECT username, email FROM users WHERE id = ?";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
+        if (!empty($newLocation)) {
+            $sql = "UPDATE user_preferences SET location = ? WHERE user_id = ?";
+            $stmt = $mysqli->prepare($sql);
+            $stmt->bind_param("si", $newLocation, $userId);
+            $stmt->execute();
+        }
 
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
+        if (!empty($newTemperatureUnit)) {
+            $sql = "UPDATE user_preferences SET temperature_unit = ? WHERE user_id = ?";
+            $stmt = $mysqli->prepare($sql);
+            $stmt->bind_param("si", $newTemperatureUnit, $userId);
+            $stmt->execute();
+        }
+
+                    // Set the success message
+                    $successMessage = "Profile updated successfully!";
     }
+
+    $userId = $_SESSION["id"];
+
+    $sql = "SELECT username, email, location, temperature_unit FROM users 
+            LEFT JOIN user_preferences ON users.id = user_preferences.user_id 
+            WHERE users.id = ?";
+    $stmt = $mysqli->prepare($sql);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc(); // we have fetched the user and their assosciated preferences.
+}
 ?>
 
 <!DOCTYPE html>
@@ -61,8 +72,6 @@
     <title>Edit Profile</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
-    <script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js" defer></script>
-    <script src="validation.js" defer></script>
     <style>
         /* Adding some spacing */
         div {
@@ -81,65 +90,79 @@
             margin-left: 10px; /* Adding some spacing between links */
             text-decoration: none;
         }
+
+        /* Style for success message */
+        .success-message {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
          function checkEmail() {
-        var newEmail = $("#email").val();
-        var currentUserEmail = "<?= htmlspecialchars($user['email']) ?>";
+            var newEmail = $("#email").val();
+            var currentUserEmail = "<?= htmlspecialchars($user['email']) ?>";
 
-        if (newEmail !== currentUserEmail) {
-            $("#loaderIcon").show();
-            jQuery.ajax({
-                url: "check-availability.php",
-                data: 'email=' + newEmail,
-                type: "POST",
-                success: function(data) {
-                    $("#check-email").html(data);
-                    $("#loaderIcon").hide();
-                },
-                error: function() {}
-            });
+            if (newEmail !== currentUserEmail) {
+                $("#loaderIcon").show();
+                jQuery.ajax({
+                    url: "check-availability.php",
+                    data: 'email=' + newEmail,
+                    type: "POST",
+                    success: function(data) {
+                        $("#check-email").html(data);
+                        $("#loaderIcon").hide();
+                    },
+                    error: function() {}
+                });
+            }
         }
-    }
 
-    function checkUsername() {
-        var newUser = $("#username").val();
-        var currentUsername = "<?= htmlspecialchars($user['username']) ?>";
+        function checkUsername() {
+            var newUser = $("#username").val();
+            var currentUsername = "<?= htmlspecialchars($user['username']) ?>";
 
-        if (newUser !== currentUsername) {
-            $("#loaderIcon").show();
-            jQuery.ajax({
-                url: "check-availability.php",
-                data: 'username=' + newUser,
-                type: "POST",
-                success: function(data) {
-                    $("#check-username").html(data);
-                    $("#loaderIcon").hide();
-                },
-                error: function() {}
-            });
+            if (newUser !== currentUsername) {
+                $("#loaderIcon").show();
+                jQuery.ajax({
+                    url: "check-availability.php",
+                    data: 'username=' + newUser,
+                    type: "POST",
+                    success: function(data) {
+                        $("#check-username").html(data);
+                        $("#loaderIcon").hide();
+                    },
+                    error: function() {}
+                });
+            }
         }
-    }
     </script>
 </head>
 <body>
 <div id="error"></div>
     <h1>Edit Profile</h1>
-    <form id="form" method="post">
+
+    <?php if (!empty($successMessage)) { ?>
+        <div class="success-message"><?= $successMessage //displaying the success message ?></div>
+    <?php } ?>
+
+
+    <form id="form" method="post" action="edit-profile.php">
         <div>
-            <div class ="input-control">
-            <span id="check-username"></span>
-                <label for="username">Username:</label>
-                <input type="text" name="username" id="username" onblur="checkUsername()">
+            <div class="input-control">
+                <span id="check-username"></span>
+                <label for="username">Username:</label> <? // onblur calls the checkUsername method upon entering ?>
+                <input type="text" name="username" id="username" onblur="checkUsername()" value="<?= htmlspecialchars($user['username']) ?>">
             </div>
         </div>
 
         <div>
-            <div class ="input-control">
-            <span id="check-email"></span>
+            <div class="input-control">
+                <span id="check-email"></span>
                 <label for="email">Email:</label>
-                <input type="email" name="email" id="email" onblur="checkEmail()">
+                <input type="email" name="email" id="email" onblur="checkEmail()" value="<?= htmlspecialchars($user['email']) ?>">
             </div>
         </div>
 

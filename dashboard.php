@@ -21,8 +21,6 @@ if (!isset($_SESSION["id"])) {
 
     echo "Hello " . $username . " :)";
 
-    $mysqli->close();
-
     $locations = [
         "London" => ["latitude" => 51.5074, "longitude" => -0.1278],
         "Valletta" => ["latitude" => 35.8989, "longitude" => 14.5146],
@@ -33,8 +31,7 @@ if (!isset($_SESSION["id"])) {
         "Amsterdam" => ["latitude" => 52.3676, "longitude" => 4.9041]
     ];
 
-    if (array_key_exists($location, $locations)) 
-    {
+    if (array_key_exists($location, $locations)) {
         $latitude = $locations[$location]["latitude"];
         $longitude = $locations[$location]["longitude"];
 
@@ -47,80 +44,80 @@ if (!isset($_SESSION["id"])) {
         // Decoding JSON Response
         $weatherData = json_decode($jsonResponse);
 
-            if ($weatherData !== null) 
-            {
+        if ($weatherData !== null) {
 
-            // Extracting weather description from API response to check the status in order to retrieve the associated image.
+            // Extracting weather description from API response to check the status to retrieve the associated image.
             $weatherDescription = $weatherData->weather[0]->description;
 
-            $temperatureinKelvin = $weatherData->main->temp; // fetching the default temperature setting
+            $temperatureinKelvin = $weatherData->main->temp;
 
-            if($temperature_unit === "Fahrenheit")
-            {
-                $temperature = ($temperatureinKelvin - 273.15) * 9/5 + 32; //Formula from Kelvin to Fahrenheit
+            if ($temperature_unit === "Fahrenheit") {
+                $temperature = ($temperatureinKelvin - 273.15) * 9/5 + 32; // Convert to Fahrenheit
                 $temperatureUnitSymbol = "°F";
-            }
-            else // default setting which is Celsius
-            {
-                $temperature = $temperatureinKelvin - 273.15; //Formula from Kelvin to Celsius
+            } else {
+                $temperature = $temperatureinKelvin - 273.15; // Default is Celsius
                 $temperatureUnitSymbol = "°C";
             }
 
-            echo "<h1>Weather Information for $location</h1>";
-            echo "Temperature: " . round($temperature, 2) . " " . $temperatureUnitSymbol . "<br>";
-            echo "Description: " . $weatherDescription . "<br>";
-
-            // Additional weather details
-            echo "Humidity: " . $weatherData->main->humidity . "%<br>";
-            echo "Pressure: " . $weatherData->main->pressure . " hPa<br>";
-            echo "Wind Speed: " . $weatherData->wind->speed . " m/s<br>";
-            echo "Cloudiness: " . $weatherData->clouds->all . "%<br>";
-
-            $imagePath = "images/";
-
-            // Convert the UNIX timestamp (dt) to a human-readable date and tim
+            $imagePath = "images/"; // Define the default image path
+            // Format and display the local time
             $timestamp = $weatherData->dt;
-            $localTime = new DateTime("@$timestamp", new DateTimeZone('UTC')); // Create a DateTime object from the timestamp
-            $localTime->setTimezone(new DateTimeZone('Europe/Rome')); // Set the time zone based on the selected location (e.g., Europe/Rome)
+            $localTime = new DateTime("@$timestamp", new DateTimeZone('UTC'));
+            $localTime->setTimezone(new DateTimeZone('Europe/Rome'));
 
-             // Getting the current time in 24-hour format
+            // Getting the current time in 24-hour format
             $currentHour = (int)date('H', $localTime->getTimestamp());
 
-            if ($currentHour >= 6 && $currentHour < 18) 
-            {
-                // Daytime logic
+            // Daytime logic
+            if ($currentHour >= 6 && $currentHour < 18) {
                 if (stripos($weatherDescription, 'clear') !== false) {
                     $imagePath .= "sun.png";
                 }
-            }  
-                // Nighttime logic
-                if ($currentHour <= 6 && $currentHour >= 18)
-                {
+            } else { // Nighttime logic
                 if (stripos($weatherDescription, 'clear') !== false) {
                     $imagePath .= "moon.png";
                 }
             }
-                if (stripos($weatherDescription, 'cloud') !== false) 
-                {
+            if (stripos($weatherDescription, 'cloud') !== false) {
                 $imagePath .= "fewclouds.png";
-                } 
-                elseif (stripos($weatherDescription, 'rain') !== false) 
-                {
+            } elseif (stripos($weatherDescription, 'rain') !== false) {
                 $imagePath .= "rain.png";
-                }
-
+            }
             
-            // Displaying Weather Image.
-            echo "<img src='$imagePath' alt='Weather Image' width='100' height='100'><br>";
+            echo "<h2>Weather Information for $location</h2>";
 
-            $timezoneOffset = $weatherData->timezone;
+                echo "<div style='display: flex;'>";
 
-            // Format and display the local time
-            echo "Local Date and Time: " . $localTime->format("Y-m-d H:i:s") . "<br>";
+                echo "<div class='info-item' style='flex: 1; padding-right: 10px;'>";
+                echo "Temperature: " . round($temperature, 2) . " " . $temperatureUnitSymbol;
+                echo "</div>";
 
-            echo "<br><br><br><br>";
+                echo "<div class='info-item' style='flex: 1; padding-right: 10px;'>";
+                echo "Description: " . $weatherDescription;
+                echo "</div>";
+
+                echo "<div class='info-item' style='flex: 1; padding-right: 10px;'>";
+                echo "Humidity: " . $weatherData->main->humidity . "%";
+                echo "</div>";
+
+                echo "<div class='info-item' style='flex: 1; padding-right: 10px;'>";
+                echo "Pressure: " . $weatherData->main->pressure . " hPa";
+                echo "</div>";
+
+                echo "<div class='info-item' style='flex: 1; padding-right: 10px;'>";
+                echo "Wind Speed: " . $weatherData->wind->speed . " m/s";
+                echo "</div>";
+
+                echo "<div class='info-item' style='flex: 1; padding-right: 10px;'>";
+                echo "Cloudiness: " . $weatherData->clouds->all . "%";
+                echo "</div>";
+
+                echo "</div>";
+
+                echo "<div class='info-item'><img src='$imagePath' alt='Weather Image' width='100' height='100'></div>";
 
 
+            echo "<div><br><br><br><br></div>";
 
         } else {
             echo "Failed to fetch weather data.";
@@ -128,7 +125,6 @@ if (!isset($_SESSION["id"])) {
     } else {
         echo "Invalid location selected.";
     }
-
 }
 ?>
 <!DOCTYPE html>
@@ -148,25 +144,16 @@ if (!isset($_SESSION["id"])) {
             margin-left: 10px;
             text-decoration: none;
         }
-    </style>
-</head>
-<body>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
-    <style>
-        .top-right-links {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+
+        #weather-info {
+            display: flex;
+            flex-wrap: wrap;
         }
 
-        .top-right-links a {
-            margin-left: 10px;
-            text-decoration: none;
+        .info-item {
+            flex: 1;
+            padding: 10px;
+            font-size: 24px;
         }
     </style>
 </head>
@@ -179,13 +166,12 @@ if (!isset($_SESSION["id"])) {
     <input type="date" id="end-date" name="end-date">
 
     <label for="weather-type">Weather Type:</label>
-<select id="weather-type" name="weather-type">
-    <option value="">Select Weather Type (optional)</option>
-    <option value="clear">Clear</option>
-    <option value="clouds">Clouds</option>
-    <option value="rain">Rain</option>
-</select>
-
+    <select id="weather-type" name="weather-type">
+        <option value="">Select Weather Type (optional)</option>
+        <option value="clear">Clear</option>
+        <option value="clouds">Clouds</option>
+        <option value="rain">Rain</option>
+    </select>
 
     <button type="button" id="search-button">Search</button>
 </form>
@@ -202,19 +188,19 @@ if (!isset($_SESSION["id"])) {
 </html>
 
 <script>
-// Add an event listener for the search button
+// Adding an event listener for the search button
 document.getElementById('search-button').addEventListener('click', function() {
     // Getting user input
     const startDate = document.getElementById('start-date').value;
     const endDate = document.getElementById('end-date').value;
     const weatherType = document.getElementById('weather-type').value;
 
-    // Send AJAX request to the server script
+    // configuring ajax request before sending
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'search.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-    // Define the data to send
+    // Defining the data to send
     const data = `start-date=${startDate}&end-date=${endDate}&weather-type=${weatherType}`;
 
     xhr.onreadystatechange = function() {
@@ -225,13 +211,13 @@ document.getElementById('search-button').addEventListener('click', function() {
         }
     };
 
-    // Send the AJAX request
+    // sending the AJAX request
     xhr.send(data);
 });
 
 function displaySearchResults(results) {
     const searchResultsContent = document.getElementById('search-results-content');
-    searchResultsContent.innerHTML = ''; // Clear any previous results
+    searchResultsContent.innerHTML = ''; // Clearing any previous results
 
     if (results.length === 0) {
         searchResultsContent.innerHTML = '<p>No results found.</p>';
@@ -247,7 +233,7 @@ function displaySearchResults(results) {
         const temperature = result.main.temp;
         const description = result.main.description;
 
-        // Create HTML elements to display the result
+        // Creating HTML elements to display the result
         const dateElement = document.createElement('p');
         dateElement.textContent = 'Date: ' + timestamp.toLocaleDateString() + ' ' + timestamp.toLocaleTimeString();
 
@@ -263,6 +249,3 @@ function displaySearchResults(results) {
     });
 }
 </script>
-
-
-    
