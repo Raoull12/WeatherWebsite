@@ -39,5 +39,3 @@ if (!empty($_POST["username"])) {
       echo "<script>$('#submit').prop('disabled',false);</script>";
   }
 }
-
-?>

@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $stmt->bind_param("si", $hashedPassword, $userId);
             $stmt->execute();
             // Password updated successfully
-
+            $mysqli->close();
             header("Location: edit-profile.php");
         } else {
             // New passwords do not match, show an error
@@ -52,6 +52,7 @@ $userId = $_SESSION["id"];
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Change Password</title>
     <meta charset="UTF-8">
@@ -59,6 +60,7 @@ $userId = $_SESSION["id"];
     <script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js" defer></script>
     <script src="validation.js" defer></script>
 </head>
+
 <body>
     <h1>Change Password</h1>
     <div id="error"></div>
@@ -88,4 +90,5 @@ $userId = $_SESSION["id"];
         <a href="edit-profile.php">Edit Profile</a>
     </div>
 </body>
+
 </html>

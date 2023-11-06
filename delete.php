@@ -6,15 +6,13 @@ if (!isset($_SESSION["id"])) {
     exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") 
-{
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     include 'db_connection.php';
     // Check if the user confirmed the account deletion
-    if (isset($_POST["confirm"]) && $_POST["confirm"] === "yes") 
-    {
+    if (isset($_POST["confirm"]) && $_POST["confirm"] === "yes") {
         // Get the user's ID
         $userId = $_SESSION["id"];
-        
+
         // Delete the user's account, first the from the user preferences table due to the tables being linked.
         $sqlDeletePreferences = "DELETE FROM user_preferences WHERE user_id = ?";
         $stmtDeletePreferences = $mysqli->prepare($sqlDeletePreferences);
@@ -26,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
         $stmtDeleteUser = $mysqli->prepare($sqlDeleteUser);
         $stmtDeleteUser->bind_param("i", $userId);
         $stmtDeleteUser->execute();
-        
+
         // Logout the user and destroy the session
         session_destroy();
 
@@ -39,11 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Delete Account</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
 </head>
+
 <body>
     <h1>Delete Account</h1>
     <div id="error"></div>
@@ -62,4 +62,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST")
         <a href="edit-profile.php">Edit Profile</a>
     </div>
 </body>
+
 </html>

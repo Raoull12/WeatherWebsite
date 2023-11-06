@@ -7,4 +7,3 @@ session_destroy(); // Destroying the session so the user logs out.
 header("Location: login.php");
 
 exit;
-?>

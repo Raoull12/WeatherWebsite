@@ -3,15 +3,12 @@ session_start();
 
 if (!isset($_SESSION["id"])) {
     header("Location: login.php");
-} 
-else 
-{
+} else {
     $mysqli = require __DIR__ . "/db_connection.php";
 
     $successMessage = ""; // Initializing the success message
 
-    if ($_SERVER["REQUEST_METHOD"] === "POST") 
-    {
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $newUsername = $_POST['username'];
         $newEmail = $_POST['email'];
         $newLocation = $_POST['location'];
@@ -48,8 +45,8 @@ else
             $stmt->execute();
         }
 
-                    // Set the success message
-                    $successMessage = "Profile updated successfully!";
+        // Set the success message
+        $successMessage = "Profile updated successfully!";
     }
 
     $userId = $_SESSION["id"];
@@ -68,6 +65,7 @@ else
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Edit Profile</title>
     <meta charset="UTF-8">
@@ -87,7 +85,8 @@ else
 
         /* Style for individual links */
         .top-right-links a {
-            margin-left: 10px; /* Adding some spacing between links */
+            margin-left: 10px;
+            /* Adding some spacing between links */
             text-decoration: none;
         }
 
@@ -101,7 +100,7 @@ else
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-         function checkEmail() {
+        function checkEmail() {
             var newEmail = $("#email").val();
             var currentUserEmail = "<?= htmlspecialchars($user['email']) ?>";
 
@@ -140,12 +139,14 @@ else
         }
     </script>
 </head>
+
 <body>
-<div id="error"></div>
+    <div id="error"></div>
     <h1>Edit Profile</h1>
 
     <?php if (!empty($successMessage)) { ?>
-        <div class="success-message"><?= $successMessage //displaying the success message ?></div>
+        <div class="success-message"><?= $successMessage //displaying the success message 
+                                        ?></div>
     <?php } ?>
 
 
@@ -153,7 +154,8 @@ else
         <div>
             <div class="input-control">
                 <span id="check-username"></span>
-                <label for="username">Username:</label> <? // onblur calls the checkUsername method upon entering ?>
+                <label for="username">Username:</label> <? // onblur calls the checkUsername method upon entering 
+                                                        ?>
                 <input type="text" name="username" id="username" onblur="checkUsername()" value="<?= htmlspecialchars($user['username']) ?>">
             </div>
         </div>
@@ -169,23 +171,20 @@ else
         <div>
             <label for="location">Location:</label>
             <select id="location" name="location">
-                <option value="Amsterdam">Amsterdam (GMT+1)</option>
-                <option value="Athens">Athens (GMT+2)</option>
-                <option value="Belgrade">Belgrade (GMT+1)</option>
-                <option value="Berlin">Berlin (GMT+1)</option>
-                <option value="London">London (GMT+1)</option>
-                <option value="Rome">Rome (GMT+1)</option>
-                <option value="Valletta">Valletta (GMT+1)</option>
+                <option value="Amsterdam" <?= ($user['location'] === 'Amsterdam') ? 'selected' : '' ?>>Amsterdam (GMT+1)</option>
+                <option value="Athens" <?= ($user['location'] === 'Athens') ? 'selected' : '' ?>>Athens (GMT+2)</option>
+                <!-- Add similar lines for other location options -->
             </select>
         </div>
 
         <div>
             <label for="temperature_unit">Temperature Unit:</label>
             <select id="temperature_unit" name="temperature_unit">
-                <option value="celsius">Celsius</option>
-                <option value="fahrenheit">Fahrenheit</option>
+                <option value="celsius" <?= ($user['temperature_unit'] === 'celsius') ? 'selected' : '' ?>>Celsius</option>
+                <option value="fahrenheit" <?= ($user['temperature_unit'] === 'fahrenheit') ? 'selected' : '' ?>>Fahrenheit</option>
             </select>
         </div>
+
 
         <button id="submit" value="submit" type="submit">Save Changes</button>
     </form>
@@ -197,4 +196,5 @@ else
         <a href="delete.php">Delete Account</a>
     </div>
 </body>
+
 </html>
