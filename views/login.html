@@ -1,0 +1,26 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+</head>
+
+<body>
+    <h1>Login</h1>
+    {% if is_invalid %}
+        <em>Invalid Email and/or Password.</em>
+    {% endif %}
+    <form method="post">
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" value="{{ email }}">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password">
+        <button>Log in</button>
+    </form>
+    <p>Don't have an account? You can now <a href="views/registration.html">register</a>.</p>
+</body>
+
+</html>

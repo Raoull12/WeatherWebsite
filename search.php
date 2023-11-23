@@ -61,6 +61,6 @@ if (!isset($_SESSION["id"])) {
 
         echo json_encode($matchingWeatherData); //sending the data back to the dashboard
 
-        exit(); // Terminate the script
+        exit();
     }
 }
