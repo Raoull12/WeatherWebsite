@@ -1,140 +1,182 @@
 <?php
-
-require_once 'vendor/autoload.php';
-
 session_start();
 
-class Dashboard
+ if (!isset($_SESSION["id"])) 
 {
-    private $username;
-    private $topRightLinks;
-    private $weatherInfo;
+    header("Location: login.php");
+} else 
+{
 
-    public function __construct($location, $temperature, $temperatureUnitSymbol, $weatherDescription, $weatherData)
-    {
-        $this->username = $_SESSION["username"];
-        $this->topRightLinks = '<a href="logout.php">Log Out</a><a href="edit-profile.php">Edit Profile</a>';
-        $this->weatherInfo = $this->renderWeatherInfo($location, $temperature, $temperatureUnitSymbol, $weatherDescription, $weatherData);
-    }
+    $mysqli = require __DIR__ . "/db_connection.php";
+    $user_id = $_SESSION["id"];
+    $username = $_SESSION["username"];
+    $sql = "SELECT * FROM user_preferences WHERE user_id = ?";
+    $stmt = $mysqli->prepare($sql);
+    $stmt->bind_param("s", $user_id);
+    $stmt->execute();
 
-    public function render()
-    {
-        // Define the paths to the Twig templates
-        $layoutTemplate = 'views/dashboard_layout.html';
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
 
-        // Load the Twig environment
-        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/views'); // Adjust the path to your Twig templates
-        $twig = new \Twig\Environment($loader);
+    $location = $user["location"];
+    $temperature_unit = $user["temperature_unit"];
 
-        // Render the dashboard layout
-        echo $twig->render($layoutTemplate, [
-            'username' => $this->username,
-            'topRightLinks' => $this->topRightLinks,
-            'weatherInfo' => $this->weatherInfo,
-        ]);
-    }
+    echo "Hello " . $username . " :)";
 
-    private function getWeatherInfo()
-    {
+    $mysqli->close();
+
+    require_once 'vendor/autoload.php';
+
+    $locations = [
+        "London" => ["latitude" => 51.5074, "longitude" => -0.1278],
+        "Valletta" => ["latitude" => 35.8989, "longitude" => 14.5146],
+        "Belgrade" => ["latitude" => 44.7866, "longitude" => 20.4489],
+        "Athens" => ["latitude" => 37.9838, "longitude" => 23.7275],
+        "Berlin" => ["latitude" => 52.5200, "longitude" => 13.4050],
+        "Rome" => ["latitude" => 41.9028, "longitude" => 12.4964],
+        "Amsterdam" => ["latitude" => 52.3676, "longitude" => 4.9041]
+    ];
+
+    if (array_key_exists($location, $locations)) {
+        $latitude = $locations[$location]["latitude"];
+        $longitude = $locations[$location]["longitude"];
+
         $apiKey = "64b1dd546784c2f64d1169be8b09db0b";
-        $locations = [
-            "London" => ["latitude" => 51.5074, "longitude" => -0.1278],
-            "Valletta" => ["latitude" => 35.8989, "longitude" => 14.5146],
-            "Belgrade" => ["latitude" => 44.7866, "longitude" => 20.4489],
-            "Athens" => ["latitude" => 37.9838, "longitude" => 23.7275],
-            "Berlin" => ["latitude" => 52.5200, "longitude" => 13.4050],
-            "Rome" => ["latitude" => 41.9028, "longitude" => 12.4964],
-            "Amsterdam" => ["latitude" => 52.3676, "longitude" => 4.9041]
-        ];
 
-        $location = $_SESSION["location"];
+        $apiUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" . $latitude . "&lon=" . $longitude . "&appid=" . $apiKey;
 
-        $locationData = isset($locations[$location]) ? $locations[$location] : null;
+        $jsonResponse = file_get_contents($apiUrl);
 
-        if ($locationData !== null) {
-            $latitude = $locationData["latitude"];
-            $longitude = $locationData["longitude"];
+        // Decoding JSON Response
+        $weatherData = json_decode($jsonResponse);
 
-            $apiUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" . $latitude . "&lon=" . $longitude . "&appid=" . $apiKey;
+        if ($weatherData !== null) {
 
-            $jsonResponse = file_get_contents($apiUrl);
+            // Extracting weather description from API response to check the status to retrieve the associated image.
+            $weatherDescription = $weatherData->weather[0]->description;
 
-            // Decoding JSON Response
-            $weatherData = json_decode($jsonResponse);
+            $temperatureinKelvin = $weatherData->main->temp;
 
-            if ($weatherData !== null) {
-                return $this->renderWeatherInfo($weatherData);
+            if ($temperature_unit === "Fahrenheit") {
+                $temperature = ($temperatureinKelvin - 273.15) * 9 / 5 + 32; // Convert to Fahrenheit
+                $temperatureUnitSymbol = "°F";
             } else {
-                return "Failed to fetch weather data.";
+                $temperature = $temperatureinKelvin - 273.15; // Default is Celsius
+                $temperatureUnitSymbol = "°C";
+            }
+
+            $imagePath = "images/"; // Define the default image path
+            // Format and display the local time
+            $timestamp = $weatherData->dt;
+            $localTime = new DateTime("@$timestamp", new DateTimeZone('UTC'));
+            $localTime->setTimezone(new DateTimeZone('Europe/Rome'));
+
+            // Getting the current time in 24-hour format
+            $currentHour = (int)date('H', $localTime->getTimestamp());
+
+            // Daytime logic
+            if ($currentHour >= 6 && $currentHour < 18) {
+                if (stripos($weatherDescription, 'clear') !== false) {
+                    $imagePath .= "sun.png";
+                } else if (stripos($weatherDescription, 'cloud') !== false) {
+                    $imagePath .= "fewclouds.png";
+                }
+            }            // Nighttime logic
+            else  if ($currentHour >= 18 || $currentHour < 6) {
+                if (stripos($weatherDescription, 'clear') !== false) {
+                    $imagePath .= "moon.png";
+                } else if (stripos($weatherDescription, 'cloud') !== false) {
+                    $imagePath .= "fewcloudsnight.png";
+                }
+            } elseif (stripos($weatherDescription, 'rain') !== false) {
+                $imagePath .= "rain.png";
             }
         } else {
-            return "Invalid location selected.";
+            echo "Failed to fetch weather data.";
         }
+    } else {
+        echo "Invalid location selected.";
     }
 
-    private function renderWeatherInfo($weatherData)
-    {
-        // Define the path to the Twig template
-        $weatherTemplate = 'weather_info.html';
+    $loader = new \Twig\Loader\FilesystemLoader(__DIR__);
 
-        // Load the Twig environment
-        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/views'); // Adjust the path to your Twig templates
-        $twig = new \Twig\Environment($loader);
+// Initializing Twig
+    $twig = new \Twig\Environment($loader);
 
-        $temperatureUnitSymbol = $_SESSION["temperature_unit"];
-
-        // Render the weather info template
-        return $twig->render($weatherTemplate, [
-            'location' => $weatherData->name,
-            'temperature' => $weatherData->main->temp,
-            'temperatureUnitSymbol' => $temperatureUnitSymbol,
-            'weatherDescription' => $weatherData->weather[0]->description,
-            'humidity' => $weatherData->main->humidity,
-            'pressure' => $weatherData->main->pressure,
-            'windSpeed' => $weatherData->wind->speed,
-            'cloudiness' => $weatherData->clouds->all,
-            'imagePath' => $this->getImagePath($weatherData->weather[0]->description, $weatherData->dt),
-        ]);
-    }
-
-
-    private function getImagePath($weatherDescription, $timestamp)
-    {
-        $imagePath = "images/";
-
-        $localTime = new DateTime("@$timestamp", new DateTimeZone('UTC'));
-        $localTime->setTimezone(new DateTimeZone('Europe/Rome'));
-        $currentHour = (int) date('H', $localTime->getTimestamp());
-
-        if ($currentHour >= 6 && $currentHour < 18) {
-            if (stripos($weatherDescription, 'clear') !== false) {
-                $imagePath .= "sun.png";
-            } elseif (stripos($weatherDescription, 'cloud') !== false) {
-                $imagePath .= "fewclouds.png";
-            }
-        } elseif ($currentHour >= 18 || $currentHour < 6) {
-            if (stripos($weatherDescription, 'clear') !== false) {
-                $imagePath .= "moon.png";
-            } elseif (stripos($weatherDescription, 'cloud') !== false) {
-                $imagePath .= "fewcloudsnight.png";
-            }
-        } elseif (stripos($weatherDescription, 'rain') !== false) {
-            $imagePath .= "rain.png";
-        }
-
-        return $imagePath;
-    }
+// Rendering the template with variables
+echo $twig->render('dashboard.twig', [
+    'username' => $username,
+    'location' => $location,
+    'temperature' => round($temperature, 2),
+    'temperatureUnitSymbol' => $temperatureUnitSymbol,
+    'weatherDescription' => $weatherDescription,
+    'humidity' => $weatherData->main->humidity,
+    'windSpeed' => $weatherData->wind->speed,
+    'cloudiness' => $weatherData->clouds->all,
+    'imagePath' => $imagePath
+]);
 }
-
-// Usage in your main file (e.g., dashboard.php)
-$is_invalid = false; // Replace with your logic to check for invalid sessions
-$dashboard = new Dashboard(
-    $_SESSION["username"],
-    $location,
-    $temperature,
-    $temperatureUnitSymbol,
-    $weatherDescription,
-    $weatherData
-);
-$dashboard->render();
 ?>
+
+<script>
+    // Adding an event listener for the search button
+    document.getElementById('search-button').addEventListener('click', function() {
+        // Getting user input
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+        const weatherType = document.getElementById('weather-type').value;
+
+        // configuring ajax request before sending
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'search.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        // Defining the data to send
+        const data = `start-date=${startDate}&end-date=${endDate}&weather-type=${weatherType}`;
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle the server's response (display search results)
+                const searchResults = JSON.parse(xhr.responseText);
+                displaySearchResults(searchResults);
+            }
+        };
+
+        // sending the AJAX request
+        xhr.send(data);
+    });
+
+    function displaySearchResults(results) {
+        const searchResultsContent = document.getElementById('search-results-content');
+        searchResultsContent.innerHTML = ''; // Clearing any previous results
+
+        if (results.length === 0) {
+            searchResultsContent.innerHTML = '<p>No results found.</p>';
+            return;
+        }
+
+        // Iterate through the search results and display them
+        results.forEach(result => {
+            const resultContainer = document.createElement('div');
+            resultContainer.className = 'search-result';
+
+            const timestamp = new Date(result.dt * 1000); // Convert UNIX timestamp to a date
+            const temperature = result.main.temp;
+            const description = result.main.description;
+
+            // Creating HTML elements to display the result
+            const dateElement = document.createElement('p');
+            dateElement.textContent = 'Date: ' + timestamp.toLocaleDateString() + ' ' + timestamp.toLocaleTimeString();
+
+            const temperatureElement = document.createElement('p');
+            temperatureElement.textContent = 'Temperature: ' + temperature + ' °K';
+
+            // Append elements to the result container
+            resultContainer.appendChild(dateElement);
+            resultContainer.appendChild(temperatureElement);
+
+            // Append the result container to the search results content
+            searchResultsContent.appendChild(resultContainer);
+        });
+    }
+</script>
