@@ -1,59 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Registration</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js" defer></script>
     <script src="validation.js" defer></script>
 </head>
 
 <body>
 
-    <h1>Register</h1>
-    <div id="error"></div>
-    <form id="form" action="registration.php" method="post">
-        <div>
-            <span id="check-username"></span>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" onblur="checkUsername()" required>
-        </div>
+    <div class="container mt-5">
+        <h1>Register</h1>
 
-        <div class="input-control">
-            <span id="check-email"></span>
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" onblur="checkEmail()" required>
-        </div>
+        <div id="error"></div>
 
-        <div class="input-control">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-        </div>
+        <form id="form" action="registration.php" method="post">
+            <div class="form-group">
+                <span id="check-username"></span>
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" onblur="checkUsername()" required>
+            </div>
 
-        <div class="input-control">
-            <label for="password_confirmation">Repeat password</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required>
-        </div>
+            <div class="form-group">
+                <span id="check-email"></span>
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" onblur="checkEmail()" required>
+            </div>
 
-        <label for="location">Location:</label>
-        <select id="Location" name="location">
-            <option value="Amsterdam">Amsterdam (GMT+1)</option>
-            <option value="Athens">Athens (GMT+2)</option>
-            <option value="Belgrade">Belgrade (GMT+1)</option>
-            <option value="Berlin">Berlin (GMT+1)</option>
-            <option value="London">London (GMT+1)</option>
-            <option value="Rome">Rome (GMT+1)</option>
-            <option value="Valletta">Valletta (GMT+1)</option>
-        </select>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
 
-        <label for="temperature_unit">Temperature Unit:</label>
-        <select id="temperature_unit" name="temperature_unit">
-            <option value="celsius">Celsius</option>
-            <option value="fahrenheit">Fahrenheit</option>
-        </select>
-        <button id="submit" type="submit" value="submit">Register</button>
-    </form>
+            <div class="form-group">
+                <label for="password_confirmation">Repeat password</label>
+                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <select class="form-control" id="Location" name="location">
+                    <option value="Amsterdam">Amsterdam (GMT+1)</option>
+                    <option value="Athens">Athens (GMT+2)</option>
+                    <option value="Belgrade">Belgrade (GMT+1)</option>
+                    <option value="Berlin">Berlin (GMT+1)</option>
+                    <option value="London">London (GMT+0)</option>
+                    <option value="Rome">Rome (GMT+1)</option>
+                    <option value="Valletta">Valletta (GMT+1)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="temperature_unit">Temperature Unit:</label>
+                <select class="form-control" id="temperature_unit" name="temperature_unit">
+                    <option value="celsius">Celsius</option>
+                    <option value="fahrenheit">Fahrenheit</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submit" value="submit">Register</button>
+        </form>
+
+        <p class="mt-3">Already have an Account? You can <a href="login.php">login</a> here.</p>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js">//this script is necessary for the below to work</script>
 
@@ -85,6 +104,5 @@
         }
     </script>
 </body>
-<p>Already have an Account?
-    You can <a href="login.php">login</a> here.</p>
+
 </html>

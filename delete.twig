@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Delete Account</title>
+    <meta charset="UTF-8">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+
+<body class="container mt-5">
+    <h1>Delete Account</h1>
+    <div id="error"></div>
+
+    {% if confirmForm %}
+        <form method="post" action="delete.php" class="mt-3">
+            <p class="mb-2">Are you sure you want to delete your account?</p>
+            <p class="mb-4">This action cannot be undone.</p>
+            <div class="form-group">
+                <label for="confirm">Type "yes" to confirm:</label>
+                <input type="text" class="form-control" name="confirm" id="confirm" required>
+            </div>
+            <button class="btn btn-danger" type="submit" value="submit">Delete Account</button>
+        </form>
+    {% else %}
+        <p class="mt-3">Account deleted successfully.</p>
+    {% endif %}
+
+    <div class="mt-3">
+        <a href="dashboard.php" class="btn btn-secondary">Go to Dashboard</a>
+        <a href="logout.php" class="btn btn-danger">Log Out</a>
+        <a href="edit-profile.php" class="btn btn-info">Edit Profile</a>
+    </div>
+</body>
+
+</html>

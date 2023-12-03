@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        /* Adding some spacing */
+        div {
+            margin-bottom: 10px;
+        }
+
+        /* Style for container */
+        .container {
+            max-width: 600px; /* Adjust the max-width as needed */
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        /* Style for individual links */
+        .top-right-links {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .top-right-links a {
+            margin-left: 10px;
+            /* Adding some spacing between links */
+            text-decoration: none;
+        }
+
+        /* Style for success message */
+        .success-message {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Style for form */
+        #form {
+            margin-bottom: 20px;
+        }
+
+        /* Style for input controls */
+        .input-control {
+            position: relative;
+        }
+
+        /* Style for loader icon */
+        #loaderIcon {
+            display: none;
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+        }
+    </style>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Your existing script -->
+    <script>
+        // Your existing script here
+    </script>
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <div id="error"></div>
+        <h1>Edit Profile</h1>
+
+        {% if successMessage is not empty %}
+            <div class="success-message">{{ successMessage }}</div>
+        {% endif %}
+
+        <form id="form" method="post" action="edit-profile.php">
+            <div class="input-control">
+                <span id="check-username"></span>
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" name="username" id="username" onblur="checkUsername()" value="{{ user.username }}">
+                <div id="loaderIcon"><img src="loader.gif" alt="Loading..."></div>
+            </div>
+
+            <div class="input-control">
+                <span id="check-email"></span>
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" name="email" id="email" onblur="checkEmail()" value="{{ user.email }}">
+                <div id="loaderIcon"><img src="loader.gif" alt="Loading..."></div>
+            </div>
+
+            <div>
+                <label for="location">Location:</label>
+                <select id="location" name="location" class="form-control">
+                    <option value="Amsterdam" {{ (user.location == 'Amsterdam') ? 'selected' : '' }}>Amsterdam (GMT+1)</option>
+                <option value="Athens" {{ (user.location == 'Athens') ? 'selected' : '' }}>Athens (GMT+2)</option>
+                <option value="Belgrade" {{ (user.location == 'Belgrade') ? 'selected' : '' }}>Belgrade (GMT+1)</option>
+                <option value="Berlin" {{ (user.location == 'Berlin') ? 'selected' : '' }}>Berlin (GMT+1)</option>
+                <option value="London" {{ (user.location == 'London') ? 'selected' : '' }}>London (GMT+0)</option>
+                <option value="Rome" {{ (user.location == 'Rome') ? 'selected' : '' }}>Rome (GMT+1)</option>
+                <option value="Valletta" {{ (user.location == 'Valletta') ? 'selected' : '' }}>Valletta (GMT+1)</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="temperature_unit">Temperature Unit:</label>
+                <select id="temperature_unit" name="temperature_unit" class="form-control">
+                    <option value="celsius" {{ (user.temperature_unit == 'celsius') ? 'selected' : '' }}>Celsius</option>
+                <option value="fahrenheit" {{ (user.temperature_unit == 'fahrenheit') ? 'selected' : '' }}>Fahrenheit</option>
+                </select>
+            </div>
+
+            <button id="submit" value="submit" type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+
+        <div class="top-right-links">
+            <a href="dashboard.php" class="btn btn-secondary">Go to Dashboard</a>
+            <a href="logout.php" class="btn btn-secondary">Log Out</a>
+            <a href="change_password.php" class="btn btn-secondary">Change Password</a>
+            <a href="delete.php" class="btn btn-danger">Delete Account</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

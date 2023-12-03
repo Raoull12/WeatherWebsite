@@ -12,10 +12,10 @@ if (!empty($_POST["email"])) { // if the post request contains an email value
   $count = $query->num_rows; //counting the number of rows
 
   if ($count > 0) { // if one or more rows are returned, the email is linked with another user account
-      echo "<span style='color:#fff'>Email Already Exists.</span>";
+      echo "<span style='color: red;'>Email Already Exists.</span>";
       echo "<script>$('#submit').prop('disabled',true);</script>"; // the submit button is disabled so the user is unable to proceed
   } else { // if 0 rows returned
-      echo "<span style='color:#fff'>Email Available.</span>";
+      echo "<span style='color: green;'>Email Available.</span>";
       echo "<script>$('#submit').prop('disabled',false);</script>"; // submit enabled
   }
 }
@@ -31,11 +31,11 @@ if (!empty($_POST["username"])) {
 
   if ($count > 0) 
   {
-      echo "<span style='color:#fff'>Username Already Exists.</span>";
+      echo "<span style='color: red;'>Username Already Exists.</span>";
       echo "<script>$('#submit').prop('disabled',true);</script>";
   } else 
   {
-      echo "<span style='color:#fff'>Username is available.</span>";
+      echo "<span style='color: green;'>Username is available.</span>";
       echo "<script>$('#submit').prop('disabled',false);</script>";
   }
 }

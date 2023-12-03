@@ -8,7 +8,7 @@ session_start();
 {
 
     $mysqli = require __DIR__ . "/db_connection.php";
-    $user_id = $_SESSION["id"];
+    $user_id = $_SESSION["id"]; // storing the userId and other details for future use
     $username = $_SESSION["username"];
     $sql = "SELECT * FROM user_preferences WHERE user_id = ?";
     $stmt = $mysqli->prepare($sql);
@@ -20,8 +20,6 @@ session_start();
 
     $location = $user["location"];
     $temperature_unit = $user["temperature_unit"];
-
-    echo "Hello " . $username . " :)";
 
     $mysqli->close();
 
@@ -155,12 +153,12 @@ echo $twig->render('dashboard.twig', [
             return;
         }
 
-        // Iterate through the search results and display them
+        // Iterating through search results and displaying them
         results.forEach(result => {
             const resultContainer = document.createElement('div');
             resultContainer.className = 'search-result';
 
-            const timestamp = new Date(result.dt * 1000); // Convert UNIX timestamp to a date
+            const timestamp = new Date(result.dt * 1000); // Converting the UNIX into a date
             const temperature = result.main.temp;
             const description = result.main.description;
 
