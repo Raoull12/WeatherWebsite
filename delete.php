@@ -1,16 +1,17 @@
 <?php
 session_start();
 
-require_once 'vendor/autoload.php';
+require_once 'vendor/autoload.php'; //including the composer's autoloader file in the script
 
 if (!isset($_SESSION["id"])) {
-    header("Location: login.php");
+    header("Location: login.php"); //redirecting the user to the login page if not logged in (session id variable not set)
     exit;
 } else {
     $isConfirmed = isset($_POST["confirm"]) && $_POST["confirm"] === "yes";
 
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        include 'db_connection.php';
+    if ($_SERVER["REQUEST_METHOD"] === "POST") { //if a post request is sent to the server
+
+        include 'db_connection.php'; //opening db connection
 
         // Check if the user confirmed the account deletion
         if (isset($_POST["confirm"]) && $_POST["confirm"] === "yes") {

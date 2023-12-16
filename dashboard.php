@@ -9,41 +9,42 @@ session_start();
 
     $mysqli = require __DIR__ . "/db_connection.php";
     $user_id = $_SESSION["id"]; // storing the userId and other details for future use
-    $username = $_SESSION["username"];
+    $username = $_SESSION["username"]; //storing the username from the session variables into a local variable
     $sql = "SELECT * FROM user_preferences WHERE user_id = ?";
     $stmt = $mysqli->prepare($sql);
     $stmt->bind_param("s", $user_id);
-    $stmt->execute();
+    $stmt->execute(); 
 
     $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
+    $user = $result->fetch_assoc(); // retrieving the preferences of the user in the current session
 
     $location = $user["location"];
-    $temperature_unit = $user["temperature_unit"];
+    $temperature_unit = $user["temperature_unit"]; //storing the retrieved location and temperature unit in local variables
 
-    $mysqli->close();
+    $mysqli->close(); // closing the database connection
 
-    require_once 'vendor/autoload.php';
+    require_once 'vendor/autoload.php'; //including the composer's autoloader file in the script
 
     $locations = [
         "London" => ["latitude" => 51.5074, "longitude" => -0.1278],
         "Valletta" => ["latitude" => 35.8989, "longitude" => 14.5146],
         "Belgrade" => ["latitude" => 44.7866, "longitude" => 20.4489],
         "Athens" => ["latitude" => 37.9838, "longitude" => 23.7275],
-        "Berlin" => ["latitude" => 52.5200, "longitude" => 13.4050],
+        "Berlin" => ["latitude" => 52.5200, "longitu
+        de" => 13.4050],
         "Rome" => ["latitude" => 41.9028, "longitude" => 12.4964],
         "Amsterdam" => ["latitude" => 52.3676, "longitude" => 4.9041]
-    ];
+    ]; // converting the locations into langitude and longitude values
 
     if (array_key_exists($location, $locations)) {
         $latitude = $locations[$location]["latitude"];
-        $longitude = $locations[$location]["longitude"];
+        $longitude = $locations[$location]["longitude"]; //storing langitude and longitude values depending on the user's stored location
 
-        $apiKey = "64b1dd546784c2f64d1169be8b09db0b";
+        $apiKey = "64b1dd546784c2f64d1169be8b09db0b"; //storing the API key in a local variable
 
-        $apiUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" . $latitude . "&lon=" . $longitude . "&appid=" . $apiKey;
+        $apiUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" . $latitude . "&lon=" . $longitude . "&appid=" . $apiKey; //joining the url with the required data 
 
-        $jsonResponse = file_get_contents($apiUrl);
+        $jsonResponse = file_get_contents($apiUrl); // retrieving the contents of the API response.
 
         // Decoding JSON Response
         $weatherData = json_decode($jsonResponse);
@@ -72,24 +73,29 @@ session_start();
             // Getting the current time in 24-hour format
             $currentHour = (int)date('H', $localTime->getTimestamp());
 
+            if (stripos($weatherDescription, 'rain') !== false || stripos($weatherDescription, 'drizzle') !== false) 
+            {
+                $imagePath .= "rain.png";
+            }
             // Daytime logic
-            if ($currentHour >= 6 && $currentHour < 18) {
+            else if ($currentHour >= 6 && $currentHour < 18) {
                 if (stripos($weatherDescription, 'clear') !== false) {
                     $imagePath .= "sun.png";
                 } else if (stripos($weatherDescription, 'cloud') !== false) {
                     $imagePath .= "fewclouds.png";
                 }
-            }            // Nighttime logic
+            }
+            // Nighttime logic
             else  if ($currentHour >= 18 || $currentHour < 6) {
                 if (stripos($weatherDescription, 'clear') !== false) {
                     $imagePath .= "moon.png";
                 } else if (stripos($weatherDescription, 'cloud') !== false) {
                     $imagePath .= "fewcloudsnight.png";
                 }
-            } elseif (stripos($weatherDescription, 'rain') !== false) {
-                $imagePath .= "rain.png";
             }
-        } else {
+        } 
+        else 
+        {
             echo "Failed to fetch weather data.";
         }
     } else {
@@ -98,7 +104,7 @@ session_start();
 
     $loader = new \Twig\Loader\FilesystemLoader(__DIR__);
 
-// Initializing Twig
+    // Initializing Twig
     $twig = new \Twig\Environment($loader);
 
 // Rendering the template with variables

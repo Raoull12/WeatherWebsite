@@ -1,16 +1,17 @@
 <?php
-session_start();
+session_start(); //starting session to retrieve variables.
 
+// Checking if the user is not logged in
 if (!isset($_SESSION["id"])) {
-    header("Location: login.php");
+    header("Location: login.php"); // Redirect to the login page if not logged in
     exit;
 }
 
-require_once 'vendor/autoload.php';
+require_once 'vendor/autoload.php'; //including the composer's autoloader file in the script
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__);
 $twig = new \Twig\Environment($loader);
 
-$userId = $_SESSION["id"];
+$userId = $_SESSION["id"]; //storing the userId in a local variable
 $successMessage = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -52,6 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
+//rendering the template using twig
 $template = $twig->load('change_password.twig');
 echo $template->render([
     'successMessage' => $successMessage

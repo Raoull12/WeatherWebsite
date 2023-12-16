@@ -20,21 +20,28 @@ if (!empty($_POST["email"])) { // if the post request contains an email value
   }
 }
 
+// Check if the "username" field is not empty in the submitted POST data
 if (!empty($_POST["username"])) {
+  // Retrieve the username from the POST data
   $username = $_POST["username"];
+
+  // Prepare and execute a SELECT query to check if the username already exists in the "users" table
   $sql = "SELECT username FROM users WHERE username = ?";
   $query = $mysqli->prepare($sql);
   $query->bind_param("s", $username);
   $query->execute();
+  
+  // Store the result and get the number of rows
   $query->store_result();
   $count = $query->num_rows;
 
-  if ($count > 0) 
-  {
+  // Check if the username already exists
+  if ($count > 0) {
+      // If the username exists, display a message in red and disable the submit button using jQuery
       echo "<span style='color: red;'>Username Already Exists.</span>";
       echo "<script>$('#submit').prop('disabled',true);</script>";
-  } else 
-  {
+  } else {
+      // If the username is available, display a message in green and enable the submit button using jQuery
       echo "<span style='color: green;'>Username is available.</span>";
       echo "<script>$('#submit').prop('disabled',false);</script>";
   }
