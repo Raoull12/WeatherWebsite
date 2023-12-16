@@ -56,13 +56,14 @@ session_start();
 
             $temperatureinKelvin = $weatherData->main->temp;
 
-            if ($temperature_unit === "Fahrenheit") {
-                $temperature = ($temperatureinKelvin - 273.15) * 9 / 5 + 32; // Convert to Fahrenheit
+            if ($temperature_unit === "fahrenheit") {
+                $temperature = round(($temperatureinKelvin - 273.15) * 9 / 5 + 32, 2); // Convert to Fahrenheit
                 $temperatureUnitSymbol = "°F";
             } else {
-                $temperature = $temperatureinKelvin - 273.15; // Default is Celsius
+                $temperature = round($temperatureinKelvin - 273.15, 2); // Default is Celsius
                 $temperatureUnitSymbol = "°C";
             }
+            
 
             $imagePath = "images/"; // Define the default image path
             // Format and display the local time

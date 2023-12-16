@@ -1,48 +1,46 @@
-<?php 
+<?php
+session_start();
+$mysqli = require __DIR__ . "/db_connection.php"; // Retrieving db file
 
-$mysqli = require __DIR__ . "/db_connection.php"; //retrieving db file
+if (!empty($_POST["email"])) {
+    $email = $_POST["email"];
+    $userId = isset($_SESSION["id"]) ? $_SESSION["id"] : null;
 
-if (!empty($_POST["email"])) { // if the post request contains an email value
-  $email = $_POST["email"]; //storing it inside of a variable
-  $sql = "SELECT email FROM users WHERE email = ?"; 
-  $query = $mysqli->prepare($sql);
-  $query->bind_param("s", $email); // the email replaces the placeholder '?'
-  $query->execute();
-  $query->store_result(); //result is stored
-  $count = $query->num_rows; //counting the number of rows
+    // Check if the email already exists for other users (excluding the current user)
+    $sql = "SELECT COUNT(*) as count FROM users WHERE email = ? AND id != ?";
+    $query = $mysqli->prepare($sql);
+    $query->bind_param("si", $email, $userId);
+    $query->execute();
+    $query->bind_result($count);
+    $query->fetch();
 
-  if ($count > 0) { // if one or more rows are returned, the email is linked with another user account
-      echo "<span style='color: red;'>Email Already Exists.</span>";
-      echo "<script>$('#submit').prop('disabled',true);</script>"; // the submit button is disabled so the user is unable to proceed
-  } else { // if 0 rows returned
-      echo "<span style='color: green;'>Email Available.</span>";
-      echo "<script>$('#submit').prop('disabled',false);</script>"; // submit enabled
-  }
+    if ($count > 0) {
+        echo "<span style='color: red;'>Email Already Exists.</span>";
+        echo "<script>$('#submit').prop('disabled', true);</script>"; //disabling the button if an invalid email is inputted
+    } else {
+        echo "<span style='color: green;'>Email Available.</span>"; 
+        echo "<script>$('#submit').prop('disabled', false);</script>"; //enabling the button if an invalid username is inputted
+    }
 }
 
-// Check if the "username" field is not empty in the submitted POST data
 if (!empty($_POST["username"])) {
-  // Retrieve the username from the POST data
   $username = $_POST["username"];
+  $userId = isset($_SESSION["id"]) ? $_SESSION["id"] : null;
 
-  // Prepare and execute a SELECT query to check if the username already exists in the "users" table
-  $sql = "SELECT username FROM users WHERE username = ?";
+  // Check if the username already exists for other users (excluding the current user)
+  $sql = "SELECT COUNT(*) as count FROM users WHERE username = ? AND id != ?";
   $query = $mysqli->prepare($sql);
-  $query->bind_param("s", $username);
+  $query->bind_param("si", $username, $userId);
   $query->execute();
-  
-  // Store the result and get the number of rows
-  $query->store_result();
-  $count = $query->num_rows;
+  $query->bind_result($count);
+  $query->fetch();
 
-  // Check if the username already exists
   if ($count > 0) {
-      // If the username exists, display a message in red and disable the submit button using jQuery
-      echo "<span style='color: red;'>Username Already Exists.</span>";
-      echo "<script>$('#submit').prop('disabled',true);</script>";
+      echo "<span style='color: red;'>Username Already Exists.</span>"; //disabling the button if an invalid username is inputted
+      echo "<script>$('#submit').prop('disabled', true);</script>";
   } else {
-      // If the username is available, display a message in green and enable the submit button using jQuery
       echo "<span style='color: green;'>Username is available.</span>";
-      echo "<script>$('#submit').prop('disabled',false);</script>";
+      echo "<script>$('#submit').prop('disabled', false);</script>"; //enabling the button if an invalid username is inputted
   }
 }
+?>

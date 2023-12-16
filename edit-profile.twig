@@ -75,11 +75,6 @@
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Your existing script -->
-    <script>
-        // Your existing script here
-    </script>
 </head>
 
 <body>
@@ -96,14 +91,14 @@
             <div class="input-control">
                 <span id="check-username"></span>
                 <label for="username">Username:</label>
-                <input type="text" class="form-control" name="username" id="username" onblur="checkUsername()" value="{{ user.username }}">
+                <input type="text" class="form-control" name="username" id="username" onblur="checkUsername()" value="{{ user.username }}"> <!--calling the checkUsername method when the user enters a username-->
                 <div id="loaderIcon"><img src="loader.gif" alt="Loading..."></div>
             </div>
 
             <div class="input-control">
                 <span id="check-email"></span>
                 <label for="email">Email:</label>
-                <input type="email" class="form-control" name="email" id="email" onblur="checkEmail()" value="{{ user.email }}">
+                <input type="email" class="form-control" name="email" id="email" onblur="checkEmail()" value="{{ user.email }}"> <!--calling the checkEmail method when the user enters an Email-->
                 <div id="loaderIcon"><img src="loader.gif" alt="Loading..."></div>
             </div>
 
@@ -143,6 +138,35 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js">//this script is necessary for the below to work</script>
+
+    <script>
+        function checkEmail() { // the onblur="checkEmail()" calls this function when inputting in the email field
+            jQuery.ajax({ // an ajax request using jquery is initiated
+                url: "check-availability.php", //the ajax request is sent to this url
+                data: 'email=' + $("#email").val(), //passing the email parameter's value from above with the request
+                type: "POST", // passing the data in a POST request
+                success: function (data) //once the ajax request is successful
+                {
+                    $("#check-email").html(data); //the span id="check-email" is passed the result of the email check from the server
+                },
+
+                error: function () { }
+            })
+        }
+        // Same goal as the checkEmail() Function.
+        function checkUsername() {
+            jQuery.ajax({
+                url: "check-availability.php",
+                data: 'username=' + $("#username").val(),
+                type: "POST",
+                success: function (data) {
+                    $("#check-username").html(data);
+                },
+                error: function () { }
+            })
+        }
+    </script>
 </body>
 
 </html>
