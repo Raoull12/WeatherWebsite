@@ -45,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["location"] = $location;
             $_SESSION["temperature_unit"] = $temperature_unit;
 
+            $mysqli->close(); //closing db connection
             // Redirect to the dashboard
             header("Location: dashboard.php");
             exit;

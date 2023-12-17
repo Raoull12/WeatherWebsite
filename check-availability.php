@@ -59,4 +59,5 @@ if (!empty($_POST["username"])) {
         echo "<span style='color: green;'>Username is available.</span>";
     }
 }
+$mysqli->close(); //closing db connection
 ?>

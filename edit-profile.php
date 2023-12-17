@@ -65,6 +65,8 @@ if (!isset($_SESSION["id"])) {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc(); // we have fetched the user and their associated preferences.
     
+    $mysqli->close(); //closing db connection
+
     $loader = new \Twig\Loader\FilesystemLoader(__DIR__);
     $twig = new \Twig\Environment($loader);
 
